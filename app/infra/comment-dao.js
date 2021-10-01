@@ -1,7 +1,8 @@
 const commentConverter = row => ({
     date: row.comment_date,
     text: row.comment_text,
-    userName: row.user_name
+    userName: row.user_name,
+    fullName: row.user_full_name
 })
 
 class CommentDao {
@@ -19,14 +20,13 @@ class CommentDao {
                         photo_id,
                         user_id
                     ) values (?,?,?, ?)
-                `,
-                [
+                `, [
                     new Date(),
                     text,
                     photoId,
                     userId,
                 ],
-                function (err) {
+                function(err) {
                     if (err) {
                         console.log(err);
                         return reject('Can`t add comment');
@@ -42,13 +42,12 @@ class CommentDao {
             this._db.all(
                 `
                 SELECT 
-                    c.comment_date, c.comment_text, u.user_name 
+                    c.comment_date, c.comment_text, u.user_name, u.user_full_name
                 FROM comment as c 
                     JOIN user as u ON u.user_id = c.user_id 
                 WHERE c.photo_id = ? 
                 ORDER BY c.comment_date DESC  
-                `,
-                [photoId],
+                `, [photoId],
                 (err, rows) => {
 
                     if (err) {
@@ -69,12 +68,11 @@ class CommentDao {
             this._db.get(
                 `
                 SELECT 
-                    c.comment_date, c.comment_text, u.user_name 
+                    c.comment_date, c.comment_text, u.user_name, u.user_full_name
                 FROM comment as c 
                     JOIN user as u ON u.user_id = c.user_id 
                 WHERE c.comment_id = ?
-                `,
-                [commentId],
+                `, [commentId],
                 (err, row) => {
                     console.log(row);
                     if (err) {

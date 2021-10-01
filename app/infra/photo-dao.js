@@ -12,7 +12,8 @@ const photoConverter = row => ({
 const commentConverter = row => ({
     date: row.comment_date,
     text: row.comment_text,
-    userName: row.user_name
+    userName: row.user_name,
+    fullName: row.fullName
 })
 
 const maxRows = 12;
@@ -49,8 +50,7 @@ class PhotoDao {
                 WHERE u.user_name = ?
                 ORDER BY p.photo_post_date DESC
                 ${limitQuery} ;
-                `,
-                [userName],
+                `, [userName],
                 (err, rows) => {
                     const photos = rows.map(photoConverter)
                     if (err) {
@@ -73,15 +73,14 @@ class PhotoDao {
                     photo_allow_comments,
                     user_id
                 ) values (?,?,?,?,?)
-            `,
-                [
+            `, [
                     new Date(),
                     photo.url,
                     photo.description,
                     photo.allowComments,
                     user_id
                 ],
-                function (err) {
+                function(err) {
                     if (err) {
                         console.log(err);
                         return reject('Can`t add photo');
@@ -106,8 +105,7 @@ class PhotoDao {
             FROM photo AS p
             WHERE p.photo_id = ?
             ORDER BY p.photo_post_date DESC;
-            `,
-            [id],
+            `, [id],
             (err, row) => {
                 if (err) {
                     console.log(err);
@@ -124,8 +122,7 @@ class PhotoDao {
 
     remove(id) {
         return new Promise((resolve, reject) => this._db.run(
-            `DELETE FROM photo where photo_id = ?`,
-            [id],
+            `DELETE FROM photo where photo_id = ?`, [id],
             err => {
                 if (err) {
                     console.log(err);
@@ -145,14 +142,13 @@ class PhotoDao {
                         photo_id,
                         user_id
                     ) values (?,?,?, ?)
-                `,
-                [
+                `, [
                     new Date(),
                     text,
                     photoId,
                     userId,
                 ],
-                function (err) {
+                function(err) {
                     if (err) {
                         console.log(err);
                         return reject('Can`t add comment');
@@ -173,8 +169,7 @@ class PhotoDao {
                     JOIN user as u ON u.user_id = c.user_id 
                 WHERE c.photo_id = ? 
                 ORDER BY c.comment_date DESC  
-                `,
-                [photoId],
+                `, [photoId],
                 (err, rows) => {
 
                     if (err) {
@@ -199,8 +194,7 @@ class PhotoDao {
                 FROM comment as c 
                     JOIN user as u ON u.user_id = c.user_id 
                 WHERE c.comment_id = ?
-                `,
-                [commentId],
+                `, [commentId],
                 (err, row) => {
                     console.log(row);
                     if (err) {
@@ -215,15 +209,14 @@ class PhotoDao {
     }
 
     likeById(photoId, userId) {
-        
+
         return new Promise((resolve, reject) => this._db.run(
             `
             INSERT OR IGNORE INTO like 
                 (photo_id, user_id) 
             VALUES 
                 (?, ?) 
-            `,
-            [photoId, userId],
+            `, [photoId, userId],
             function(err) {
                 if (err) {
                     console.log(err);

@@ -90,11 +90,10 @@ api.like = async(req, res) => {
     const { photoId } = req.params;
     const dao = new PhotoDao(req.db);
     const liked = await dao.likeById(photoId, req.user.id);
-    if (liked) {
-        console.log(`User ${req.user.name} liked photo ${photoId}`);
-        return res.status(201).end();
-    }
-    return res.status(304).end();
+
+    console.log(`User ${req.user.name} liked photo ${photoId}`);
+    return res.status(201).end();
+
 };
 
 module.exports = api;
